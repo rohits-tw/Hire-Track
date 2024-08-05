@@ -1,7 +1,11 @@
 from django.urls import path
-from .views import MyModelListCreate, MyModelDetail
+from .views import UserGetAPI
 
 urlpatterns = [
-    path('mymodels/', MyModelListCreate.as_view(), name='mymodel-list-create'),
-    path('mymodels/<int:pk>/', MyModelDetail.as_view(), name='mymodel-detail'),
+    path('GetUser/<int:id>/', UserGetAPI.as_view(), name='GetWithID'),
+    path('GetUser/', UserGetAPI.as_view(), name='GetWithoutID'),
+
 ]
+
+
+
