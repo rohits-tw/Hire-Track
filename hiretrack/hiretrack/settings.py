@@ -136,3 +136,6 @@ CACHES = {
         }
     }
 }
+
+
+AUTH_USER_MODEL = 'user.CustomUser'
