@@ -1,20 +1,16 @@
-# Create your models here.
 from django.db import models
-from django.contrib.auth.models import AbstractUser, BaseUserManager,AbstractBaseUser,PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from phonenumber_field.modelfields import PhoneNumberField
 from django.conf import settings
 
-
-
-
 class BaseModel(models.Model):
-   created_at = models.DateTimeField(auto_now_add=True)
-   updated_at = models.DateTimeField(auto_now=True)
-   created_by = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE, related_name='%(class)s_createdby')
-   updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,related_name='%(class)s_modifiedby', null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='%(class)s_createdby', null=True, blank=True)
+    updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='%(class)s_modifiedby', null=True, blank=True)
 
-   class Meta:
-       abstract = True
+    class Meta:
+        abstract = True
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, username, email, password=None, **extra_fields):
@@ -35,12 +31,11 @@ class CustomUserManager(BaseUserManager):
 
         return self.create_user(username, email, password, **extra_fields)
 
-class CustomUser(AbstractBaseUser, PermissionsMixin,BaseModel):
+class CustomUser(AbstractBaseUser, PermissionsMixin, BaseModel):
     username = models.CharField(max_length=255, unique=True)
     email = models.EmailField(unique=True)
     phone_number = PhoneNumberField(unique=True, null=True, blank=True)
     password = models.CharField(max_length=128)
-
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
@@ -53,23 +48,32 @@ class CustomUser(AbstractBaseUser, PermissionsMixin,BaseModel):
         return self.username
 
 class UserDetail(BaseModel):
-    CANDIDATE = 'candidate'
-    INTERVIEWER = 'interviewer'
+    ROLE_CHOICE = {
+        'CANDIDATE': 'Candidate',
+        'INTERVIEWER': 'Interviewer'
+   }
 
-    ROLE_CHOICES = [
-        (CANDIDATE, 'Candidate'),
-        (INTERVIEWER, 'Interviewer'),
+
+    GENDER_CHOICES = [
+        ('M', 'Male'),
+        ('F', 'Female'),
+        ('O', 'Other'),
     ]
 
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='user_detail')
-    firstname = models.CharField(max_length=255)
-    lastname = models.CharField(max_length=255)
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default=CANDIDATE)
-    gender = models.CharField(max_length=10)
-    profile_picture = models.CharField(max_length=255)
+    firstname = models.CharField(max_length=255, null= False)
+    lastname = models.CharField(max_length=255, null= False)
+    fullname = models.CharField(max_length=255)
+    role = models.CharField(max_length=20, choices=[(key, value) for key, value in ROLE_CHOICE.items()], default='CANDIDATE')
+    gender = models.CharField(max_length=1,choices=GENDER_CHOICES,default='O')
+    profile_picture = models.FileField()
     address = models.TextField()
     
     def __str__(self):
         return f'{self.firstname} {self.lastname}'
+    
+    def save(self, *args, **kwargs):
+        self.full_name = f"{self.first_name} {self.last_name}".strip()
+        super().save(*args, **kwargs)
     
 
