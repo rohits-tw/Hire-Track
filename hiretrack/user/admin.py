@@ -8,5 +8,4 @@ class CustomUserAdmin(admin.ModelAdmin):
     search_fields = ('username', 'email')
 
 
-
 admin.site.register(UserDetail)
