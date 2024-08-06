@@ -8,8 +8,8 @@ services:
       POSTGRES_DB: hiretrackdb
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-    # volumes:
-    #   - postgres_data:/var/lib/postgresql/data
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     ports:
       - "5433:5432"  
 
@@ -33,5 +33,5 @@ services:
     environment:
       DATABASE: postgres
 
-# volumes:
-#   postgres_data:
+volumes:
+  postgres_data:
