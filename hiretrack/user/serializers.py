@@ -1,5 +1,5 @@
-# myapp/serializers.py
 from rest_framework import serializers
+from .models import CustomUser, UserDetail
 from django.contrib.auth import authenticate
 from phonenumber_field.serializerfields import PhoneNumberField
 from .models import CustomUser
@@ -35,6 +35,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 
+from phonenumber_field.serializerfields import PhoneNumberField # type: ignore
+
+
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(required=False)
     username = serializers.CharField(required=False)
@@ -63,3 +66,26 @@ class LoginSerializer(serializers.Serializer):
 
         data['user'] = user
         return data
+
+
+class CustomUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'username', 'email', 'phone_number', 'is_active', 'is_staff']
+
+
+class UserDetailSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = UserDetail
+        fields = [
+            'id', 'user', 'firstname', 'lastname', 'fullname', 
+            'role', 'gender', 'profile_picture', 'address', 
+            'created_at', 'updated_at', 'created_by', 'updated_by'
+        ]
+
+    def get_user(self, obj):
+        """Return a nested representation of the related CustomUser."""
+        return CustomUserSerializer(obj.user).data
+
