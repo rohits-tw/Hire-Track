@@ -1,9 +1,9 @@
 from django.urls import path
-from .views import UserGetAPI
+from .views import GetUser
 
 urlpatterns = [
-    path('GetUser/<int:id>/', UserGetAPI.as_view(), name='GetWithID'),
-    path('GetUser/', UserGetAPI.as_view(), name='GetWithoutID'),
+    path('get-user/<int:id>/', GetUser.as_view(), name='get-user'),
+    path('get-user/', GetUser.as_view(), name='get-user'),
 
 ]
 

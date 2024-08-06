@@ -73,7 +73,7 @@ class UserDetail(BaseModel):
         return f'{self.firstname} {self.lastname}'
     
     def save(self, *args, **kwargs):
-        self.full_name = f"{self.first_name} {self.last_name}".strip()
+        self.fullname = f"{self.firstname} {self.lastname}".strip()
         super().save(*args, **kwargs)
     
 

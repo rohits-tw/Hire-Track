@@ -1,29 +1,34 @@
 from rest_framework import generics
-from .models import MyModel
-from .serializers import MyModelSerializer
+from .models import  UserDetail
+from .serializers import UserDetailSerializer
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 
-# class MyModelListCreate(generics.ListCreateAPIView):
-#     queryset = MyModel.objects.all()
-#     serializer_class = MyModelSerializer
 
-# class MyModelDetail(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = MyModel.objects.all()
-#     serializer_class = MyModelSerializer
+class GetUser(APIView):
 
 
-class UserGetAPI(APIView):
     def get(self, request, id = None):
         if id is not None:
-            try:
-                object = MyModel.objects.get(id = id)
-            except MyModel.DoesNotExist:
+            user_obj = self.fetch_user(id=id)
+
+            if not user_obj:
                 return Response({"status":False, "msg":"User does not exists"})
-            serializer = MyModelSerializer(object)
+                        
+            serializer = UserDetailSerializer(user_obj)
             return Response({"status":True, "msg":"Users fetched.", "data":serializer.data})
-        objects = MyModel.objects.all()
-        serializer = MyModelSerializer(objects, many = True)
+        
+        user_objs = UserDetail.objects.all()
+        serializer = UserDetailSerializer(user_objs, many = True)
         return Response({"status":True, "msg":"Users fetched.", "data":serializer.data})
+    
+
+    def fetch_user(self, id):
+        try:
+            user_obj = UserDetail.objects.get(id = id)
+            return user_obj
+        except UserDetail.DoesNotExist:
+            return None
+
     

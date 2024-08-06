@@ -77,7 +77,7 @@ WSGI_APPLICATION = 'hiretrack.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'Hiretrackdb',
+        'NAME': 'hiretrackdb',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
         'HOST': 'db',  
