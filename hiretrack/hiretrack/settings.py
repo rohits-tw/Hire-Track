@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'phonenumber_field',
     'user',
+    
 ]
 
 MIDDLEWARE = [
@@ -88,6 +89,19 @@ DATABASES = {
         'PORT': '5432',
     }
 }
+
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'hiretrackdb',
+#         'USER': 'postgres',
+#         'PASSWORD': 'postgres',
+#         'HOST': 'localhost',  
+#         'PORT': '5432',
+#     }
+# }
+
 
 
 # Password validation
