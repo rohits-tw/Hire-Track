@@ -7,5 +7,4 @@ class CustomUserAdmin(admin.ModelAdmin):
     list_display = ('username', 'email', 'phone_number', 'is_active', 'is_staff')
     search_fields = ('username', 'email')
 
-
 admin.site.register(UserDetail)
