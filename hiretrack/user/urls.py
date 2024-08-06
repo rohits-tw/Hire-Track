@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import LoginAPIView, LogoutAPIView, TokenRefreshView, DummyView
+from .views import LoginAPIView, LogoutAPIView, TokenRefreshView
 
 urlpatterns = [
     path('login/', LoginAPIView.as_view(), name='login'),
