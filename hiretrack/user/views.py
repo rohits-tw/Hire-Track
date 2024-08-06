@@ -3,7 +3,29 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny
 from rest_framework import generics, status
 from rest_framework.response import Response
-from .serializers import LoginSerializer
+from .serializers import LoginSerializer, RegisterSerializer
+
+
+
+class RegisterUserAPIView(generics.CreateAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = RegisterSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        user = serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        refresh = RefreshToken.for_user(user)
+        return Response({
+                "status": True,
+                "msg": "User created successfully.",
+                "user": serializer.data,
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+            }, status=status.HTTP_201_CREATED)
+      
+
+
 
 class LoginAPIView(generics.GenericAPIView):
     """
@@ -29,28 +51,28 @@ class LoginAPIView(generics.GenericAPIView):
         }, status=status.HTTP_200_OK)
     
 
-class TokenRefreshView(generics.GenericAPIView):
-    """
-    Handles token refresh requests and returns a new access token.
-    """
-    permission_classes = [AllowAny]
+# class TokenRefreshView(generics.GenericAPIView):
+#     """
+#     Handles token refresh requests and returns a new access token.
+#     """
+#     permission_classes = [AllowAny]
 
-    def post(self, request, *args, **kwargs):
-        """
-        Processes the token refresh request and returns a new access token if valid.
+#     def post(self, request, *args, **kwargs):
+#         """
+#         Processes the token refresh request and returns a new access token if valid.
         
-        :param request: The request object containing the refresh token.
-        :return: A response containing the new access token if the refresh token is valid.
-        """
-        try:
-            refresh_token = request.data['refresh_token']
-            token = RefreshToken(refresh_token)
-            access_token = token.access_token
-            return Response({
-                'access': str(access_token),
-            }, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({"detail": "Invalid refresh token"}, status=status.HTTP_400_BAD_REQUEST)
+#         :param request: The request object containing the refresh token.
+#         :return: A response containing the new access token if the refresh token is valid.
+#         """
+#         try:
+#             refresh_token = request.data['refresh_token']
+#             token = RefreshToken(refresh_token)
+#             access_token = token.access_token
+#             return Response({
+#                 'access': str(access_token),
+#             }, status=status.HTTP_200_OK)
+#         except Exception as e:
+#             return Response({"detail": "Invalid refresh token"}, status=status.HTTP_400_BAD_REQUEST)
         
 class LogoutAPIView(generics.GenericAPIView):
     """
