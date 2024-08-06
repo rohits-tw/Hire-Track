@@ -1,9 +1,11 @@
-# myapp/views.py
+from rest_framework import generics,status
+from .models import  UserDetail
+from .serializers import UserDetailSerializer,LoginSerializer
+from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
+from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny
-from rest_framework import generics, status
-from rest_framework.response import Response
-from .serializers import LoginSerializer
 
 class LoginAPIView(generics.GenericAPIView):
     """
@@ -72,4 +74,30 @@ class LogoutAPIView(generics.GenericAPIView):
             return Response(status=status.HTTP_205_RESET_CONTENT)
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class GetUser(APIView):
+    def get(self, request, id = None):
+        if id is not None:
+            user_obj = self.fetch_user(id=id)
+
+            if not user_obj:
+                return Response({"status":False, "msg":"User does not exists"})
+                        
+            serializer = UserDetailSerializer(user_obj)
+            return Response({"status":True, "msg":"Users fetched.", "data":serializer.data})
+        
+        user_objs = UserDetail.objects.all()
+        serializer = UserDetailSerializer(user_objs, many = True)
+        return Response({"status":True, "msg":"Users fetched.", "data":serializer.data})
+    
+
+    def fetch_user(self, id):
+        try:
+            user_obj = UserDetail.objects.get(id = id)
+            return user_obj
+        except UserDetail.DoesNotExist:
+            return None
+
+    
 
