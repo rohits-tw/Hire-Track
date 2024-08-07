@@ -1,14 +1,13 @@
 from rest_framework import generics,status
-from .models import  UserDetail
-from .serializers import UserDetailSerializer,LoginSerializer
+from .models import  UserDetail, CustomUser
+from .serializers import UserDetailSerializer,LoginSerializer, RegisterSerializer, GetUserSerializers
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny
-from rest_framework import generics, status
-from rest_framework.response import Response
-from .serializers import LoginSerializer, RegisterSerializer
+from .query import get_all_user,get_user
+
 
 
 
@@ -80,26 +79,15 @@ class LogoutAPIView(generics.GenericAPIView):
 
 class GetUser(APIView):
     def get(self, request, id = None):
-        if id is not None:
-            user_obj = self.fetch_user(id=id)
+        if id:
+            user = get_user(id)
+            serializer = GetUserSerializers(user,many =True)
 
-            if not user_obj:
-                return Response({"status":False, "msg":"User does not exists"})
-                        
-            serializer = UserDetailSerializer(user_obj)
-            return Response({"status":True, "msg":"Users fetched.", "data":serializer.data})
-        
-        user_objs = UserDetail.objects.all()
-        serializer = UserDetailSerializer(user_objs, many = True)
+            if not user:
+                return Response({"status":False, "msg":"User does not exists"})  
+            return Response({"status":True, "msg":"Users fetched.", "data":serializer.data})     
+        all_user=get_all_user()
+        serializer = GetUserSerializers(all_user,many =True)
+
         return Response({"status":True, "msg":"Users fetched.", "data":serializer.data})
     
-
-    def fetch_user(self, id):
-        try:
-            user_obj = UserDetail.objects.get(id = id)
-            return user_obj
-        except UserDetail.DoesNotExist:
-            return None
-
-    
-

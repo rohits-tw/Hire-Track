@@ -75,17 +75,26 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
-    user = serializers.SerializerMethodField()
+    # user = serializers.SerializerMethodField()
     
     class Meta:
         model = UserDetail
         fields = [
-            'id', 'user', 'firstname', 'lastname', 'fullname', 
+            'id', 'firstname', 'lastname', 'fullname', 
             'role', 'gender', 'profile_picture', 'address', 
             'created_at', 'updated_at', 'created_by', 'updated_by'
         ]
 
-    def get_user(self, obj):
-        """Return a nested representation of the related CustomUser."""
-        return CustomUserSerializer(obj.user).data
+    # def get_user(self, obj):
+    #     """Return a nested representation of the related CustomUser."""
+    #     return CustomUserSerializer(obj.user).data
+
+
+
+
+class GetUserSerializers(serializers.ModelSerializer):
+    user_detail = UserDetailSerializer(read_only=True)
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'email', 'phone_number','user_detail']
 

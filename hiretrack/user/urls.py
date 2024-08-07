@@ -1,7 +1,6 @@
 from django.urls import path
-from .views import LoginAPIView, LogoutAPIView,RegisterUserAPIView
 from .backends import  TokenRefreshView
-from .views import GetUser,LoginAPIView, LogoutAPIView, TokenRefreshView
+from .views import LoginAPIView, LogoutAPIView,RegisterUserAPIView, GetUser
 
 
    
