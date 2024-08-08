@@ -9,6 +9,10 @@ from phonenumber_field.serializerfields import PhoneNumberField
 
 
 class RegisterSerializer(serializers.ModelSerializer):
+    """
+    Serializer for user registration. It includes email, password, and username fields.
+    Validates the uniqueness of the email and ensures password confirmation.
+    """
     email = serializers.EmailField(
         required=True,
         validators=[UniqueValidator(queryset=CustomUser.objects.all())]
@@ -17,16 +21,25 @@ class RegisterSerializer(serializers.ModelSerializer):
         write_only=True, required=True, validators=[validate_password]
     )
     password2 = serializers.CharField(write_only=True, required=True)
+
     class Meta:
         model = CustomUser
         fields = ('username', 'password', 'password2', 'email')
+
     def validate(self, attrs):
+        """
+        Validate that both password fields match.
+        """
         if attrs['password'] != attrs['password2']:
             raise serializers.ValidationError(
                 {"password": "Password fields didn't match."}
             )
         return attrs
+
     def create(self, validated_data):
+        """
+        Create and return a new user instance, given the validated data.
+        """
         user = CustomUser.objects.create(
             username=validated_data['username'],
             email=validated_data['email']
@@ -37,19 +50,27 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class LoginSerializer(serializers.Serializer):
+    """
+    Serializer for user login. It includes email, username, or phone number fields along with the password.
+    Validates that at least one of email, username, or phone number is provided.
+    """
     email = serializers.EmailField(required=False)
     username = serializers.CharField(required=False)
     phone_number = PhoneNumberField(required=False)
     password = serializers.CharField(write_only=True)
 
     def validate(self, data):
+        """
+        Validate that at least one of email, username, or phone number is provided,
+        and check the credentials for authentication.
+        """
         email = data.get('email')
         username = data.get('username')
         phone_number = data.get('phone_number')
         password = data.get('password')
 
         if not email and not username and not phone_number:
-            raise serializers.ValidationError('Email, username or phone number is required to login.')
+            raise serializers.ValidationError('Email, username, or phone number is required to login.')
 
         user = None
         if email:

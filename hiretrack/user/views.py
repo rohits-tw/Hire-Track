@@ -82,18 +82,21 @@ class LogoutAPIView(generics.GenericAPIView):
 
 
 class GetUser(APIView):
-    def get(self, request, id = None):
+    """
+    API view to retrieve user(s). If an ID is provided, retrieves a specific user.
+    Otherwise, retrieves all users.
+    """
+    def get(self, request, id=None):
         if id:
             user = get_user(id)
-            serializer = GetUserSerializers(user,many =True)
-
             if not user:
-                return Response({"status":False, "msg":"User does not exists"})  
-            return Response({"status":True, "msg":"Users fetched.", "data":serializer.data})     
-        all_user=get_all_user()
-        serializer = GetUserSerializers(all_user,many =True)
+                return Response({"status": False, "msg": "User does not exist"})
+            serializer = GetUserSerializers(user, many=False)
+            return Response({"status": True, "msg": "User fetched.", "data": serializer.data})
 
-        return Response({"status":True, "msg":"Users fetched.", "data":serializer.data})
+        all_users = get_all_user()
+        serializer = GetUserSerializers(all_users, many=True)
+        return Response({"status": True, "msg": "Users fetched.", "data": serializer.data})
     
 
 class UpdateUserDetailView(generics.UpdateAPIView):

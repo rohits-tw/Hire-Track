@@ -8,7 +8,12 @@ from rest_framework.response import Response
 
 
 class CustomBackend(ModelBackend):
+    """
+    Custom authentication backend to authenticate users using email, username, or phone number.
+    """
     def authenticate(self, request, username=None, email=None, phone_number=None, password=None, **kwargs):
+        user = None
+
         if email:
             try:
                 user = CustomUser.objects.get(email=email)
@@ -24,13 +29,10 @@ class CustomBackend(ModelBackend):
                 user = CustomUser.objects.get(phone_number=phone_number)
             except CustomUser.DoesNotExist:
                 return None
-        else:
-            return None
 
-        if user.check_password(password):
+        if user and user.check_password(password):
             return user
         return None
-
 
 
 class TokenRefreshView(generics.GenericAPIView):
