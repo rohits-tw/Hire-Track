@@ -120,9 +120,12 @@ class UpdateUserDetailView(generics.UpdateAPIView):
         provided data and saves the changes if the data is valid. If the data
         is not valid, it returns an error response.
         """
-        user_detail = self.get_object()
-        serializer = self.serializer_class(user_detail, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save(updated_by=request.user) 
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            user_detail = self.get_object()
+            serializer = self.serializer_class(user_detail, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save(updated_by=request.user) 
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
