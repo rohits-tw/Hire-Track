@@ -5,6 +5,7 @@ from phonenumber_field.serializerfields import PhoneNumberField
 from .models import CustomUser
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
+from phonenumber_field.serializerfields import PhoneNumberField 
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -33,9 +34,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.set_password(validated_data['password'])
         user.save()
         return user
-
-
-from phonenumber_field.serializerfields import PhoneNumberField # type: ignore
 
 
 class LoginSerializer(serializers.Serializer):
@@ -90,11 +88,18 @@ class UserDetailSerializer(serializers.ModelSerializer):
     #     return CustomUserSerializer(obj.user).data
 
 
-
-
 class GetUserSerializers(serializers.ModelSerializer):
     user_detail = UserDetailSerializer(read_only=True)
     class Meta:
         model = CustomUser
         fields = ['id', 'email', 'phone_number','user_detail']
+
+
+class UpdateUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserDetail
+        fields = [
+            'firstname', 'lastname', 'profile_picture', 
+            'address', 'gender','fullname'
+        ]
 
