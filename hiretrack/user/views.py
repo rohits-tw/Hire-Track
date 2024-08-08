@@ -1,6 +1,6 @@
 from rest_framework import generics,status,permissions
 from .models import  UserDetail, CustomUser
-from .serializers import UserDetailSerializer,LoginSerializer, RegisterSerializer, GetUserSerializers,UpdateUserSerializer
+from .serializers import UserDetailSerializer,LoginSerializer, RegisterSerializer, GetUserSerializers,UpdateUserSerializer, AddUserDetailSerializers
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
@@ -32,7 +32,6 @@ class RegisterUserAPIView(generics.CreateAPIView):
                 'access': str(refresh.access_token),
             }, status=status.HTTP_201_CREATED)
       
-
 
 class LoginAPIView(generics.GenericAPIView):
     """
@@ -82,18 +81,21 @@ class LogoutAPIView(generics.GenericAPIView):
 
 
 class GetUser(APIView):
-    def get(self, request, id = None):
+    """
+    API view to retrieve user(s). If an ID is provided, retrieves a specific user.
+    Otherwise, retrieves all users.
+    """
+    def get(self, request, id=None):
         if id:
             user = get_user(id)
-            serializer = GetUserSerializers(user,many =True)
-
             if not user:
-                return Response({"status":False, "msg":"User does not exists"})  
-            return Response({"status":True, "msg":"Users fetched.", "data":serializer.data})     
-        all_user=get_all_user()
-        serializer = GetUserSerializers(all_user,many =True)
+                return Response({"status": False, "msg": "User does not exist"})
+            serializer = GetUserSerializers(user, many=False)
+            return Response({"status": True, "msg": "User fetched.", "data": serializer.data})
 
-        return Response({"status":True, "msg":"Users fetched.", "data":serializer.data})
+        all_users = get_all_user()
+        serializer = GetUserSerializers(all_users, many=True)
+        return Response({"status": True, "msg": "Users fetched.", "data": serializer.data})
     
 
 class UpdateUserDetailView(generics.UpdateAPIView):
@@ -129,3 +131,23 @@ class UpdateUserDetailView(generics.UpdateAPIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class AddUserDetailView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    """
+    View to handle adding user details for the currently authenticated user:
+    This view handles POST requests to add user details for the logged-in user. 
+    It checks if user details already exist and either saves the new details or returns an error.
+    """
+    def post(self, request):
+        user = request.user
+        data = request.data
+        serializer = AddUserDetailSerializers(data=data)
+        if UserDetail.objects.filter(user=user).exists():
+            return Response({"status": False, "msg": "Data Already Exists"}, status=status.HTTP_400_BAD_REQUEST)
+        if serializer.is_valid():
+            serializer.save(user=user)
+            return Response({"status": True, "msg": "Data Saved"}, status=status.HTTP_201_CREATED)
+        else:
+            return Response({"status": False, "msg": "Data not saved", "errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
