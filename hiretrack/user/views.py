@@ -33,7 +33,6 @@ class RegisterUserAPIView(generics.CreateAPIView):
             }, status=status.HTTP_201_CREATED)
       
 
-
 class LoginAPIView(generics.GenericAPIView):
     """
     Handles user login and returns a refresh and access token.

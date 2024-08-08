@@ -94,8 +94,6 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
-    # user = serializers.SerializerMethodField()
-    
     class Meta:
         model = UserDetail
         fields = [
@@ -116,6 +114,12 @@ class GetUserSerializers(serializers.ModelSerializer):
         fields = ['id', 'email', 'phone_number','user_detail']
 
 
+class AddUserDetailSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = UserDetail
+        fields = [
+            'id','firstname', 'lastname', 'fullname', 'role', 'gender', 'profile_picture', 'address','created_at', 'updated_at', 'created_by', 'updated_by'
+        ]
 class UpdateUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserDetail
