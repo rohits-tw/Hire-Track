@@ -1,6 +1,6 @@
 from rest_framework import generics,status,permissions
 from .models import  UserDetail, CustomUser
-from .serializers import UserDetailSerializer,LoginSerializer, RegisterSerializer, GetUserSerializers,AddUserDetailSerializers
+from .serializers import UserDetailSerializer,LoginSerializer, RegisterSerializer, GetUserSerializers,UpdateUserSerializer
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
@@ -10,6 +10,12 @@ from .query import get_all_user,get_user
 
 
 class RegisterUserAPIView(generics.CreateAPIView):
+    """API view for registering a new user.
+
+        This view handles user registration by accepting user data, validating it,
+        and creating a new user. Upon successful registration, it returns a response
+        containing the user's data along with JWT tokens (refresh and access).
+    """
     permission_classes = [AllowAny]
     serializer_class = RegisterSerializer
 
@@ -51,6 +57,7 @@ class LoginAPIView(generics.GenericAPIView):
         }, status=status.HTTP_200_OK)
     
 
+  
 class LogoutAPIView(generics.GenericAPIView):
     """
     Handles user logout by blacklisting the refresh token.
@@ -73,36 +80,54 @@ class LogoutAPIView(generics.GenericAPIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-class GetUserView(APIView):
-    def get(self, request, id = None):
+class GetUser(APIView):
+    """
+    API view to retrieve user(s). If an ID is provided, retrieves a specific user.
+    Otherwise, retrieves all users.
+    """
+    def get(self, request, id=None):
         if id:
             user = get_user(id)
-            serializer = GetUserSerializers(user,many =True)
-
             if not user:
-                return Response({"status":False, "msg":"User does not exists"})  
-            return Response({"status":True, "msg":"Users fetched.", "data":serializer.data})     
-        all_user=get_all_user()
-        serializer = GetUserSerializers(all_user,many =True)
+                return Response({"status": False, "msg": "User does not exist"})
+            serializer = GetUserSerializers(user, many=False)
+            return Response({"status": True, "msg": "User fetched.", "data": serializer.data})
 
-        return Response({"status":True, "msg":"Users fetched.", "data":serializer.data})
+        all_users = get_all_user()
+        serializer = GetUserSerializers(all_users, many=True)
+        return Response({"status": True, "msg": "Users fetched.", "data": serializer.data})
+    
 
+class UpdateUserDetailView(generics.UpdateAPIView):
+    """
+    API view to update the details of the currently authenticated user's profile.
 
-class AddUserDetailView(APIView):
+    This view allows an authenticated user to update their own profile details,
+    including fields like `firstname`, `lastname`, `profile_picture`, `address`, etc.
+    """
     permission_classes = [permissions.IsAuthenticated]
-    """
-    View to handle adding user details for the currently authenticated user:
-    This view handles POST requests to add user details for the logged-in user. 
-    It checks if user details already exist and either saves the new details or returns an error.
-    """
-    def post(self, request):
-        user = request.user
-        data = request.data.copy()  
-        serializer = AddUserDetailSerializers(data=data)
-        if UserDetail.objects.filter(user=user).exists():
-            return Response({"status": False, "msg": "Data Already Exists"}, status=status.HTTP_400_BAD_REQUEST)
-        if serializer.is_valid():
-            serializer.save(user=user)
-            return Response({"status": True, "msg": "Data Saved"}, status=status.HTTP_201_CREATED)
-        else:
-            return Response({"status": False, "msg": "Data not saved", "errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+    serializer_class = UpdateUserSerializer
+
+    def get_object(self):
+        """
+        get_object():
+        Retrieves the `UserDetail` instance related to the currently authenticated user.
+        """
+        return self.request.user.user_detail
+
+    def put(self, request, *args, **kwargs):
+        """
+        put(request, *args, **kwargs):
+        Handles PUT requests to update the `UserDetail` instance. Validates the
+        provided data and saves the changes if the data is valid. If the data
+        is not valid, it returns an error response.
+        """
+        try:
+            user_detail = self.get_object()
+            serializer = self.serializer_class(user_detail, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save(updated_by=request.user) 
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
