@@ -1,6 +1,6 @@
 from rest_framework import generics,status,permissions
 from .models import  UserDetail, CustomUser
-from .serializers import UserDetailSerializer,LoginSerializer, RegisterSerializer, GetUserSerializers,UpdateUserSerializer
+from .serializers import UserDetailSerializer,LoginSerializer, RegisterSerializer, GetUserSerializers,UpdateUserSerializer, AddUserDetailSerializer
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
@@ -131,3 +131,23 @@ class UpdateUserDetailView(generics.UpdateAPIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class AddUserDetailView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    """
+    View to handle adding user details for the currently authenticated user:
+    This view handles POST requests to add user details for the logged-in user. 
+    It checks if user details already exist and either saves the new details or returns an error.
+    """
+    def post(self, request):
+        user = request.user
+        data = request.data
+        serializer = AddUserDetailSerializers(data=data)
+        if UserDetail.objects.filter(user=user).exists():
+            return Response({"status": False, "msg": "Data Already Exists"}, status=status.HTTP_400_BAD_REQUEST)
+        if serializer.is_valid():
+            serializer.save(user=user)
+            return Response({"status": True, "msg": "Data Saved"}, status=status.HTTP_201_CREATED)
+        else:
+            return Response({"status": False, "msg": "Data not saved", "errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)

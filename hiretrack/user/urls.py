@@ -18,6 +18,7 @@ urlpatterns = [
     # Above 2 URL is used to get the details of user 
     path('update-user/', UpdateUserDetailView.as_view(), name='update-user'),
     # Above URL is used to update user details 
+    path('add-user-detail/', AddUserDetailView.as_view(), name='add-user-detail'),
 ]
 
 
