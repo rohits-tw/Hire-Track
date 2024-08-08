@@ -1,6 +1,6 @@
-from rest_framework import generics,status
+from rest_framework import generics,status,permissions
 from .models import  UserDetail, CustomUser
-from .serializers import UserDetailSerializer,LoginSerializer, RegisterSerializer, GetUserSerializers
+from .serializers import UserDetailSerializer,LoginSerializer, RegisterSerializer, GetUserSerializers,UpdateUserSerializer
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
@@ -9,9 +9,13 @@ from rest_framework.permissions import AllowAny
 from .query import get_all_user,get_user
 
 
-
-
 class RegisterUserAPIView(generics.CreateAPIView):
+    """API view for registering a new user.
+
+        This view handles user registration by accepting user data, validating it,
+        and creating a new user. Upon successful registration, it returns a response
+        containing the user's data along with JWT tokens (refresh and access).
+    """
     permission_classes = [AllowAny]
     serializer_class = RegisterSerializer
 
@@ -54,7 +58,7 @@ class LoginAPIView(generics.GenericAPIView):
         }, status=status.HTTP_200_OK)
     
 
-        
+  
 class LogoutAPIView(generics.GenericAPIView):
     """
     Handles user logout by blacklisting the refresh token.
@@ -91,3 +95,37 @@ class GetUser(APIView):
 
         return Response({"status":True, "msg":"Users fetched.", "data":serializer.data})
     
+
+class UpdateUserDetailView(generics.UpdateAPIView):
+    """
+    API view to update the details of the currently authenticated user's profile.
+
+    This view allows an authenticated user to update their own profile details,
+    including fields like `firstname`, `lastname`, `profile_picture`, `address`, etc.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UpdateUserSerializer
+
+    def get_object(self):
+        """
+        get_object():
+        Retrieves the `UserDetail` instance related to the currently authenticated user.
+        """
+        return self.request.user.user_detail
+
+    def put(self, request, *args, **kwargs):
+        """
+        put(request, *args, **kwargs):
+        Handles PUT requests to update the `UserDetail` instance. Validates the
+        provided data and saves the changes if the data is valid. If the data
+        is not valid, it returns an error response.
+        """
+        try:
+            user_detail = self.get_object()
+            serializer = self.serializer_class(user_detail, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save(updated_by=request.user) 
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
