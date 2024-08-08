@@ -1,6 +1,6 @@
 from rest_framework import generics,status,permissions
 from .models import  UserDetail, CustomUser
-from .serializers import UserDetailSerializer,LoginSerializer, RegisterSerializer, GetUserSerializers,UpdateUserSerializer, AddUserDetailSerializer
+from .serializers import UserDetailSerializer,LoginSerializer, RegisterSerializer, GetUserSerializers,UpdateUserSerializer, AddUserDetailSerializers
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
