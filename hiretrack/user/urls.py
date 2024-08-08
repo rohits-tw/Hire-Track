@@ -1,6 +1,6 @@
 from django.urls import path
 from .backends import  TokenRefreshView
-from .views import LoginAPIView, LogoutAPIView,RegisterUserAPIView, GetUser,UpdateUserDetailView
+from .views import LoginAPIView, LogoutAPIView,RegisterUserAPIView, GetUser,UpdateUserDetailView , AddUserDetailView
 
 
    
