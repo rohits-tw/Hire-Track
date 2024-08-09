@@ -7,6 +7,8 @@ from .views import (
     GetUser,
     UpdateUserDetailView,
     AddUserDetailView,
+    ForgotPasswordView,
+    ResetPasswordView
 )
 from .backends import  TokenRefreshView
 from .views import LoginAPIView, LogoutAPIView,RegisterUserAPIView, GetUser,UpdateUserDetailView , AddUserDetailView, ChangePasswordView
@@ -29,5 +31,7 @@ urlpatterns = [
     # Above URL is used to add details of login user
     path('change-password/', ChangePasswordView.as_view(), name='change-password'),
     # Above URL is used to change password of login user
+    path('forgot-password/', ForgotPasswordView.as_view(), name='forgot-password'),
+    path('reset-password/<str:uidb64>/<str:key>/', ResetPasswordView.as_view(), name='reset-password'),
 
 ]
