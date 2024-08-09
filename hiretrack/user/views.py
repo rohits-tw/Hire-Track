@@ -1,12 +1,13 @@
 from rest_framework import generics, status, permissions
 from .models import UserDetail, CustomUser
 from .serializers import (
-    UserDetailSerializer,
     LoginSerializer,
     RegisterSerializer,
     GetUserSerializers,
     UpdateUserSerializer,
     AddUserDetailSerializers,
+    ForgotPasswordSerializer,
+    ResetPasswordSerializer,
 )
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
@@ -14,6 +15,10 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny
 from .query import get_all_user, get_user
+from django.core.mail import send_mail
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+import uuid
 
 
 class RegisterUserAPIView(generics.CreateAPIView):
@@ -185,3 +190,51 @@ class AddUserDetailView(APIView):
                 {"status": False, "msg": "Data not saved", "errors": serializer.errors},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+
+class ForgotPasswordView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = ForgotPasswordSerializer(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data["email"]
+            user = get_object_or_404(CustomUser, email=email)
+            key = uuid.uuid4().hex
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            reset_url = f"http://0.0.0.0:8000/api/user/reset-password/{uid}/{key}/"
+            send_mail(
+                "Reset Your Password",
+                f"Click the link to reset your password: {reset_url}",
+                "no-reply@yourdomain.com",
+                [email],
+                fail_silently=False,
+            )
+            return Response(
+                {"message": "Password reset email sent."}, status=status.HTTP_200_OK
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ResetPasswordView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, uidb64, key):
+        try:
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            user = get_object_or_404(CustomUser, pk=uid)
+        except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist):
+            user = None
+        if user is not None:
+            serializer = ResetPasswordSerializer(data=request.data)
+            if serializer.is_valid():
+                user.set_password(serializer.validated_data["password"])
+                user.save()
+                return Response(
+                    {"message": "Password reset successfully."},
+                    status=status.HTTP_200_OK,
+                )
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {"error": "Invalid reset link."}, status=status.HTTP_400_BAD_REQUEST
+        )
