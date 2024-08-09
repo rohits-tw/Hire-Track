@@ -7,6 +7,8 @@ from .views import (
     GetUser,
     UpdateUserDetailView,
     AddUserDetailView,
+    ForgotPasswordView,
+    ResetPasswordView
 )
 
 
@@ -18,10 +20,12 @@ urlpatterns = [
     # token/refresh is used to refresh tocken
     path("register/", RegisterUserAPIView.as_view(), name="register"),
     # Above URL is used to register new user
-    path("get-user/<int:id>/", GetUser.as_view(), name="get-user"),
-    path("get-all-user/", GetUser.as_view(), name="get-all-user"),
-    # Above 2 URL is used to get the details of user
-    path("update-user/", UpdateUserDetailView.as_view(), name="update-user"),
-    # Above URL is used to update user details
-    path("add-user-detail/", AddUserDetailView.as_view(), name="add-user-detail"),
+    path('get-user/<int:id>/', GetUser.as_view(), name='get-user'),
+    path('get-all-user/', GetUser.as_view(), name='get-all-user'),
+    # Above 2 URL is used to get the details of user 
+    path('update-user/', UpdateUserDetailView.as_view(), name='update-user'),
+    # Above URL is used to update user details 
+    path('add-user-detail/', AddUserDetailView.as_view(), name='add-user-detail'),
+    path('forgot-password/', ForgotPasswordView.as_view(), name='forgot-password'),
+    path('reset-password/<str:uidb64>/<str:key>/', ResetPasswordView.as_view(), name='reset-password'),
 ]
