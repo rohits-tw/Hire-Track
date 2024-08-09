@@ -167,6 +167,11 @@ class UpdateUserSerializer(serializers.ModelSerializer):
         ]
 
 
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True, write_only=True, min_length = 8)
+    new_password = serializers.CharField(required=True, write_only=True, min_length = 8)
+    
+
 class ForgotPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
@@ -178,7 +183,6 @@ class ForgotPasswordSerializer(serializers.Serializer):
                 "No user is associated with this email address."
             )
         return value
-
 
 class ResetPasswordSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True, min_length=8)
