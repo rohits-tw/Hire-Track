@@ -1,18 +1,18 @@
 from rest_framework import generics, status, permissions
 from .models import UserDetail, CustomUser
 from .serializers import (
-    UserDetailSerializer,
     LoginSerializer,
     RegisterSerializer,
     GetUserSerializers,
     UpdateUserSerializer,
     AddUserDetailSerializers,
+    ChangePasswordSerializer,
 )
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from .query import get_all_user, get_user
 
 
@@ -185,3 +185,50 @@ class AddUserDetailView(APIView):
                 {"status": False, "msg": "Data not saved", "errors": serializer.errors},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+
+class ChangePasswordView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ChangePasswordSerializer
+    """
+    Change the password for the authenticated user.
+
+    **Process:**
+    1. Validate the request data using the serializer.
+    2. Verify the old password.
+    3. Set the new password and save the user.
+    """
+
+    def post(self, request):
+        try:
+            serializer = self.serializer_class(data=request.data)
+            if serializer.is_valid():
+                user = request.user
+                old_password = serializer.validated_data.get('old_password')
+                new_password = serializer.validated_data.get('new_password')
+
+                if user.check_password(old_password):
+                    if old_password == new_password:
+                        return Response(
+                            {"status": False, "message": "New password should be different from the old password."},
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
+                    user.set_password(new_password)
+                    user.save()
+                    return Response(
+                        {"status": True, "message": "Password changed successfully."},
+                        status=status.HTTP_200_OK
+                    )
+                return Response(
+                    {"status": False, "error": "Old password is incorrect."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response(
+                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+        
+
+

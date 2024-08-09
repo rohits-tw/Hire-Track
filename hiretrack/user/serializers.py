@@ -165,3 +165,9 @@ class UpdateUserSerializer(serializers.ModelSerializer):
             "gender",
             "fullname",
         ]
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True, write_only=True, min_length = 8)
+    new_password = serializers.CharField(required=True, write_only=True, min_length = 8)
+    
