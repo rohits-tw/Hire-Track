@@ -39,9 +39,22 @@ class GetTeam(APIView):
             raise APIException(detail=str(e))
 
 
+class DelTeam(APIView):
+    def delete(self, request, team_id):
+        try:
+            team =get_by_id(team_id)
+            
+            team.delete()
+            
+            return Response({"detail": "Team deleted successfully"}, status=status.HTTP_200_OK)
+        
+        except Team.DoesNotExist:
+            raise NotFound(detail="Team not found", status=status.HTTP_404_NOT_FOUND)
+        
+        except Exception as e:
+            raise APIException(detail=str(e))
 
 
 
-# Create your views here.
-def test(request):
-    return HttpResponse("hd")
+
+
