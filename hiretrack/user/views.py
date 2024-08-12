@@ -9,7 +9,6 @@ from .serializers import (
     ChangePasswordSerializer,
     ForgotPasswordSerializer,
     ResetPasswordSerializer,
-
 )
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
@@ -211,30 +210,34 @@ class ChangePasswordView(APIView):
             serializer = self.serializer_class(data=request.data)
             if serializer.is_valid():
                 user = request.user
-                old_password = serializer.validated_data.get('old_password')
-                new_password = serializer.validated_data.get('new_password')
+                old_password = serializer.validated_data.get("old_password")
+                new_password = serializer.validated_data.get("new_password")
 
                 if user.check_password(old_password):
                     if old_password == new_password:
                         return Response(
-                            {"status": False, "message": "New password should be different from the old password."},
-                            status=status.HTTP_400_BAD_REQUEST
+                            {
+                                "status": False,
+                                "message": "New password should be different from the old password.",
+                            },
+                            status=status.HTTP_400_BAD_REQUEST,
                         )
                     user.set_password(new_password)
                     user.save()
                     return Response(
                         {"status": True, "message": "Password changed successfully."},
-                        status=status.HTTP_200_OK
+                        status=status.HTTP_200_OK,
                     )
                 return Response(
                     {"status": False, "error": "Old password is incorrect."},
-                    status=status.HTTP_400_BAD_REQUEST
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
 
 class ForgotPasswordView(APIView):
     permission_classes = [AllowAny]

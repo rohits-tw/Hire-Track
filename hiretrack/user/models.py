@@ -68,12 +68,12 @@ class CustomUser(AbstractBaseUser, PermissionsMixin, BaseModel):
 
 
 class UserDetail(BaseModel):
-    ROLE_CHOICE = {"CANDIDATE": "Candidate", "INTERVIEWER": "Interviewer"}
+    ROLE_CHOICE = {"Candidate": "Candidate", "Interviewer": "Interviewer"}
 
     GENDER_CHOICES = [
-        ("M", "Male"),
-        ("F", "Female"),
-        ("O", "Other"),
+        ("Male", "Male"),
+        ("Female", "Female"),
+        ("Other", "Other"),
     ]
 
     user = models.OneToOneField(
@@ -85,9 +85,9 @@ class UserDetail(BaseModel):
     role = models.CharField(
         max_length=20,
         choices=[(key, value) for key, value in ROLE_CHOICE.items()],
-        default="CANDIDATE",
+        default="Candidate",
     )
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, default="O")
+    gender = models.CharField(max_length=25, choices=GENDER_CHOICES, default="Other")
     profile_picture = models.FileField()
     address = models.TextField()
 
