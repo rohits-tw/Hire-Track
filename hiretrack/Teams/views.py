@@ -39,6 +39,22 @@ class GetTeam(APIView):
             raise APIException(detail=str(e))
 
 
+class DelTeam(APIView):
+    def get(self, request, team_id):
+        try:
+            team = get_by_id(team_id)
+            del_data =team.delete
+            if del_data:
+                return Response(detail='Team deleted', status=status.HTTP_200_OK)
+            return Response(detail ='reintitate the process',status =status.HTTP_400_BAD_REQUEST)
+        
+        except Team.DoesNotExist:
+            raise NotFound(detail="Team not found",status = status.HTTP_400_BAD_REQUEST)
+        
+        except Exception as e:
+            raise APIException(detail=str(e))
+
+
 
 
 
