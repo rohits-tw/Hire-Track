@@ -19,17 +19,17 @@ class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         write_only=True, required=True, validators=[validate_password]
     )
-    password2 = serializers.CharField(write_only=True, required=True)
+    confirm_password = serializers.CharField(write_only=True, required=True)
 
     class Meta:
         model = CustomUser
-        fields = ("username", "password", "password2", "email")
+        fields = ("username", "email", "password", "confirm_password")
 
     def validate(self, attrs):
         """
         Validate that both password fields match.
         """
-        if attrs["password"] != attrs["password2"]:
+        if attrs["password"] != attrs["confirm_password"]:
             raise serializers.ValidationError(
                 {"password": "Password fields didn't match."}
             )
@@ -53,9 +53,7 @@ class LoginSerializer(serializers.Serializer):
     Validates that at least one of email, username, or phone number is provided.
     """
 
-    email = serializers.EmailField(required=False)
     username = serializers.CharField(required=False)
-    phone_number = PhoneNumberField(required=False)
     password = serializers.CharField(write_only=True)
 
     def validate(self, data):
@@ -74,20 +72,11 @@ class LoginSerializer(serializers.Serializer):
             )
 
         user = None
-        if email:
-            user = authenticate(
-                request=self.context.get("request"), email=email, password=password
-            )
-        elif username:
+
+        if username:
             user = authenticate(
                 request=self.context.get("request"),
                 username=username,
-                password=password,
-            )
-        elif phone_number:
-            user = authenticate(
-                request=self.context.get("request"),
-                phone_number=phone_number,
                 password=password,
             )
 
@@ -121,10 +110,6 @@ class UserDetailSerializer(serializers.ModelSerializer):
             "created_by",
             "updated_by",
         ]
-
-    # def get_user(self, obj):
-    #     """Return a nested representation of the related CustomUser."""
-    #     return CustomUserSerializer(obj.user).data
 
 
 class GetUserSerializers(serializers.ModelSerializer):
@@ -168,9 +153,9 @@ class UpdateUserSerializer(serializers.ModelSerializer):
 
 
 class ChangePasswordSerializer(serializers.Serializer):
-    old_password = serializers.CharField(required=True, write_only=True, min_length = 8)
-    new_password = serializers.CharField(required=True, write_only=True, min_length = 8)
-    
+    old_password = serializers.CharField(required=True, write_only=True, min_length=8)
+    new_password = serializers.CharField(required=True, write_only=True, min_length=8)
+
 
 class ForgotPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -183,6 +168,7 @@ class ForgotPasswordSerializer(serializers.Serializer):
                 "No user is associated with this email address."
             )
         return value
+
 
 class ResetPasswordSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True, min_length=8)
