@@ -5,7 +5,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import ValidationError, APIException
 from .serializers import CreateTeamSerializer
-from Teams.query import get_by_id
+from Teams.query import get_by_id,get_team_members,get_member_id
+from rest_framework.permissions import IsAuthenticated
+
 
 class CreateTeam(APIView):
     def post(self, request):
@@ -55,6 +57,30 @@ class DelTeam(APIView):
             raise APIException(detail=str(e))
 
 
+# List and Create Team Members
+class TeamMembersListCreateView(APIView):
+    permission_classes = [IsAuthenticated]
 
+    def get(self, request):
+        team_members = get_team_members()
+        serializer = TeamMembersSerializer(team_members, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = TeamMembersSerializer(data=request.data)
+        if serializer.is_valid():
+            team_member = serializer.save()  
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class TeamMembersDeleteView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, id):
+        team_member = get_member_id(id)
+        team_member.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
