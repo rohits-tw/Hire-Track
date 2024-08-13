@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from Teams.models import Team
+from Teams.models import Team,TeamMembers
 
 class CreateTeamSerializer(serializers.ModelSerializer):
  
@@ -21,3 +21,30 @@ class CreateTeamSerializer(serializers.ModelSerializer):
         
         team.save()
         return team
+
+
+class TeamMembersSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TeamMembers
+        fields = ['id', 'allotment_team', 'member', 'designation', 'allotment_date', 'active']
+
+
+
+    def save(self, **kwargs):
+        allotment_team = self.validated_data.get('allotment_team')
+        member = self.validated_data.get('member')
+        designation = self.validated_data.get('designation')
+        active = self.validated_data.get('active', True) 
+
+        if not allotment_team or not member:
+            raise serializers.ValidationError("Allotment team and member are required fields.")
+
+        instance = TeamMembers(
+            allotment_team=allotment_team,
+            member=member,
+            designation=designation,
+            active=active,
+        )
+        instance.save()
+
+        return instance
