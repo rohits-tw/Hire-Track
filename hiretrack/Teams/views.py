@@ -2,15 +2,17 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status, permissions
+from rest_framework import status
 from rest_framework.exceptions import ValidationError, APIException, NotFound
 from .serializers import (
     CreateTeamSerializer,
     UpdateTeamSerializer,
     GetAllTeamserializer,
+    TeamMembersSerializer,
 )
 from .models import Team
-from Teams.query import get_by_id, get_all_user
+from Teams.query import get_by_id, get_team_members, get_member_id, get_all_user
+from rest_framework.permissions import IsAuthenticated
 
 
 class CreateTeamView(APIView):
@@ -48,7 +50,7 @@ class GetTeamView(APIView):
 
 
 class DeleteTeamView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def delete(self, request, id):
         try:
@@ -65,8 +67,34 @@ class DeleteTeamView(APIView):
             )
 
 
+# List and Create Team Members
+class TeamMembersListCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        team_members = get_team_members()
+        serializer = TeamMembersSerializer(team_members, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = TeamMembersSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class TeamMembersDeleteView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, id):
+        team_members = get_member_id(id)
+        team_members.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 class UpdateTeamView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     serializer_class = UpdateTeamSerializer
 
     def post(self, request, id):
@@ -74,7 +102,7 @@ class UpdateTeamView(APIView):
             team = get_by_id(id)
         except Team.DoesNotExist:
             return Response(
-                {"status": False, "message": "id not found"},
+                {"status": False, "message": "Team id not found"},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
