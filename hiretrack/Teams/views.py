@@ -8,10 +8,17 @@ from .serializers import (
     CreateTeamSerializer,
     UpdateTeamSerializer,
     GetAllTeamserializer,
+    GetTeamMembersSerializer,
     TeamMembersSerializer,
 )
-from .models import Team
-from Teams.query import get_by_id, get_team_members, get_member_id, get_all_user
+from .models import Team, TeamMembers
+from Teams.query import (
+    get_by_id,
+    get_team_members,
+    get_member_id,
+    get_all_user,
+    get_members,
+)
 from rest_framework.permissions import IsAuthenticated
 
 
@@ -22,7 +29,7 @@ class CreateTeamView(APIView):
             if serializer.is_valid():
                 serializer.save()
                 return Response(
-                    {"message": "Team created successfully", "team": serializer.data},
+                    {"message": "Team created successfully", "Team": serializer.data},
                     status=status.HTTP_201_CREATED,
                 )
 
@@ -40,7 +47,7 @@ class GetTeamView(APIView):
         try:
             team = get_by_id(id)
             serializer = CreateTeamSerializer(team)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response({"status": True, "Teams": serializer.data})
 
         except Team.DoesNotExist:
             raise NotFound("Message : Team not found")
@@ -71,26 +78,44 @@ class DeleteTeamView(APIView):
 class TeamMembersListCreateView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        team_members = get_team_members()
-        serializer = TeamMembersSerializer(team_members, many=True)
-        return Response(serializer.data)
+    def get(self, request, team_id):
+        try:
+            team_members = get_members(team_id)
+            serializer = GetTeamMembersSerializer(team_members, many=True)
+            return Response(
+                {"status": True, "message": "Team members", "Teams": serializer.data}
+            )
+        except TeamMembers.DoesNotExist:
+            return Response(
+                {"status": False, "message": "Team member not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
     def post(self, request):
         serializer = TeamMembersSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"status": True, "message": "Team Member added successfully"}
+            )
+        return Response({"status": False, "message": "Team Member not added!!"})
 
 
 class TeamMembersDeleteView(APIView):
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, id):
-        team_members = get_member_id(id)
-        team_members.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        try:
+            team_members = get_member_id(id)
+            team_members.delete()
+            return Response(
+                {"status": True, "message": "Team Member deleted successfully"}
+            )
+        except TeamMembers.DoesNotExist:
+            return Response(
+                {"status": False, "message": "Team member not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
 
 class UpdateTeamView(APIView):

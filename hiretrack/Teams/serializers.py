@@ -1,8 +1,8 @@
 from rest_framework import serializers
-from Teams.models import Team,TeamMembers
+from Teams.models import Team, TeamMembers
+
 
 class CreateTeamSerializer(serializers.ModelSerializer):
- 
 
     class Meta:
         model = Team
@@ -25,18 +25,25 @@ class CreateTeamSerializer(serializers.ModelSerializer):
 class TeamMembersSerializer(serializers.ModelSerializer):
     class Meta:
         model = TeamMembers
-        fields = ['id', 'allotment_team', 'member', 'designation', 'allotment_date', 'active']
-
-
+        fields = [
+            "id",
+            "allotment_team",
+            "member",
+            "designation",
+            "allotment_date",
+            "active",
+        ]
 
     def save(self, **kwargs):
-        allotment_team = self.validated_data.get('allotment_team')
-        member = self.validated_data.get('member')
-        designation = self.validated_data.get('designation')
-        active = self.validated_data.get('active', True) 
+        allotment_team = self.validated_data.get("allotment_team")
+        member = self.validated_data.get("member")
+        designation = self.validated_data.get("designation")
+        active = self.validated_data.get("active", True)
 
         if not allotment_team or not member:
-            raise serializers.ValidationError("Allotment team and member are required fields.")
+            raise serializers.ValidationError(
+                "Allotment team and member are required fields."
+            )
 
         instance = TeamMembers(
             allotment_team=allotment_team,
@@ -48,6 +55,7 @@ class TeamMembersSerializer(serializers.ModelSerializer):
 
         return instance
 
+
 class UpdateTeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
@@ -58,3 +66,9 @@ class GetAllTeamserializer(serializers.ModelSerializer):
     class Meta:
         model = Team
         fields = ["id", "name", "description", "team_lead"]
+
+
+class GetTeamMembersSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TeamMembers
+        fields = ["id", "designation", "allotment_date", "active"]
