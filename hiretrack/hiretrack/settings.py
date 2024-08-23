@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'phonenumber_field',
     'user',
     'Teams',
-    
+   
 ]
 
 MIDDLEWARE = [
