@@ -1,21 +1,27 @@
-version: '3.8'
+version: '3'
 
 services:
   db:
-    image: postgres:13
+    image: postgres
     container_name: hiretrack_postgres
     environment:
-      POSTGRES_DB: hiretrackdb
+      POSTGRES_DB: postgres
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "5433:5432"  
+      - "5432:5432"
+    volumes:
+      - "postgres_data:/var/lib/postgresql/data"
+    networks:
+      - hiretrack_network
 
   redis:
     image: redis:6
     container_name: hiretrack_redis
     ports:
       - "6379:6379"  # Map Redis port
+    networks:
+      - hiretrack_network
 
   web:
     build: .
@@ -30,4 +36,14 @@ services:
       - redis
     environment:
       DATABASE: postgres
+    networks:
+      - hiretrack_network
 
+
+volumes:
+  postgres_data:
+
+
+networks:
+  hiretrack_network:
+    driver: bridge
