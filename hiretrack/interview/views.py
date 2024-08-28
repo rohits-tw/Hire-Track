@@ -4,7 +4,9 @@ from rest_framework import status
 from interview.serializers import (
     CreateInterviewSerializer,
     ListInterviewSerializer,
-    UpdateStatusSerializer
+    UpdateStatusSerializer,
+    ListAllInterviewSerializer,
+    ListInterviewHistoryByUserIdSerializer,
 )
 from rest_framework.views import APIView
 from rest_framework.exceptions import ValidationError, APIException
@@ -84,7 +86,7 @@ class ListAllInterviewsView(APIView):
     def get(self, request):
         try:
             all_interview = get_all_interview_details()
-            serializer = ListInterviewSerializer(all_interview, many=True)
+            serializer = ListAllInterviewSerializer(all_interview, many=True)
             return Response(
                 {
                     "status": True,
@@ -109,20 +111,11 @@ class ListInterviewHistoryByUserId(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, id):
-        try:
-            interviews = get_interview_from_user_id(id)
-            if not interviews.exists():
-                return Response(
-                    {"status": False, "message": "No interviews found"},
-                    status=status.HTTP_404_NOT_FOUND,
-                )
-            serializer = ListInterviewSerializer(interviews, many=True)
+
+        interviews = get_interview_from_user_id(id)
+        if not interviews.exists():
             return Response(
-                {"status": True, "message": "Interview", "interviews": serializer.data}
-            )
-        except InterviewForUser.DoesNotExist:
-            return Response(
-                {"status": False, "message": "Interview Details not found"},
+                {"status": False, "message": "No interviews found"},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -153,3 +146,7 @@ class UpdateInterviewStatusView(APIView):
             return Response({"status": True, "message": "interview status updated successfully"})
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer = ListInterviewHistoryByUserIdSerializer(interviews, many=True)
+        return Response(
+            {"status": True, "message": "Interview", "interviews": serializer.data}
+        )
