@@ -14,3 +14,8 @@ def get_all_interview_details():
 def get_interview_from_user_id(id):
     interview = InterviewForUser.objects.filter(interviewer_id=id).all()
     return interview
+
+
+def get_by_id(id):
+    interview = InterviewForUser.objects.get(id=id)
+    return interview
