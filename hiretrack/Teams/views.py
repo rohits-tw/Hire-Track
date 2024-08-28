@@ -23,6 +23,13 @@ from rest_framework.permissions import IsAuthenticated
 
 
 class CreateTeamView(APIView):
+    """
+    View to handle create team for the currently authenticated user:
+    This view handles POST requests to create team for the logged-in user.
+    """
+
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
         try:
             serializer = CreateTeamSerializer(data=request.data)
@@ -43,6 +50,14 @@ class CreateTeamView(APIView):
 
 
 class GetTeamView(APIView):
+    """
+    View to handle get team by id for the currently authenticated user:
+    This view handles GET requests to get team for the logged-in user.
+    It checks if team details is not exists it returns an error.
+    """
+
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, id):
         try:
             team = get_by_id(id)
@@ -57,6 +72,12 @@ class GetTeamView(APIView):
 
 
 class DeleteTeamView(APIView):
+    """
+    View to handle delete team by id efor the currently authenticated user:
+    This view handles DELETE requests to delete team for the logged-in user.
+    It checks if team details is not exists it returns an error.
+    """
+
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, id):
@@ -76,6 +97,12 @@ class DeleteTeamView(APIView):
 
 # List and Create Team Members
 class TeamMembersListCreateView(APIView):
+    """
+    View to handle get team member by id for the currently authenticated user:
+    This view handles GET requests to get team for the logged-in user.
+    It checks if team member details is not exists it returns an error.
+    """
+
     permission_classes = [IsAuthenticated]
 
     def get(self, request, team_id):
@@ -91,6 +118,12 @@ class TeamMembersListCreateView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
+    """
+    View to handle create team member for the currently authenticated user:
+    This view handles POST requests to create team for the logged-in user.
+    It checks if team member details is not exists it returns an error.
+    """
+
     def post(self, request):
         serializer = TeamMembersSerializer(data=request.data)
         if serializer.is_valid():
@@ -102,6 +135,12 @@ class TeamMembersListCreateView(APIView):
 
 
 class TeamMembersDeleteView(APIView):
+    """
+    View to handle delete team member by id for the currently authenticated user:
+    This view handles DELETE requests to delete team for the logged-in user.
+    It checks if team member details is not exists it returns an error.
+    """
+
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, id):
@@ -119,6 +158,12 @@ class TeamMembersDeleteView(APIView):
 
 
 class UpdateTeamView(APIView):
+    """
+    View to handle update team by id for the currently authenticated user:
+    This view handles POST requests to update team for the logged-in user.
+    It checks if team details is not exists it returns an error.
+    """
+
     permission_classes = [IsAuthenticated]
     serializer_class = UpdateTeamSerializer
 
@@ -141,6 +186,11 @@ class UpdateTeamView(APIView):
 
 
 class GetAllTeamView(APIView):
+    """
+    View to handle get all team for the currently authenticated user:
+    This view handles GET requests to get all team for the logged-in user.
+    """
+
     def get(self, request):
         team = get_all_user()
         if team:
