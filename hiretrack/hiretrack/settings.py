@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "Teams",
     "interview",
     "ckeditor",
+    "question_repository",
 ]
 
 MIDDLEWARE = [
@@ -84,7 +85,7 @@ WSGI_APPLICATION = "hiretrack.wsgi.application"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'hiretrackdb',
+        'NAME': 'postgres',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
         'HOST': 'db',  
