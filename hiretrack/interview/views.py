@@ -4,6 +4,7 @@ from rest_framework import status
 from interview.serializers import (
     CreateInterviewSerializer,
     ListInterviewSerializer,
+    UpdateStatusSerializer
 )
 from rest_framework.views import APIView
 from rest_framework.exceptions import ValidationError, APIException
@@ -13,6 +14,7 @@ from interview.query import (
     get_interview_details_by_id,
     get_all_interview_details,
     get_interview_from_user_id,
+    get_by_id,
 )
 
 
@@ -123,3 +125,31 @@ class ListInterviewHistoryByUserId(APIView):
                 {"status": False, "message": "Interview Details not found"},
                 status=status.HTTP_404_NOT_FOUND,
             )
+
+
+class UpdateInterviewStatusView(APIView):
+    """
+    View to handle update interview stauts by id for the currently authenticated user:
+    This view handles POST requests to update interview status for the logged-in user.
+    It checks if interview details are not exists it returns an error.
+    """
+
+    permission_classes = [IsAuthenticated]
+    serializer_class = UpdateStatusSerializer
+
+    def post(self, request, id):
+        try:
+            interview = get_by_id(id)
+        except InterviewForUser.DoesNotExist:
+            return Response(
+                {"status": False, "message": "interview id not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        serializer = self.serializer_class(interview, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"status": True, "message": "interview status updated successfully"})
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -32,4 +32,4 @@ class InterviewForUser(models.Model):
     )
 
     def __str__(self):
-        return "Interview Schedule"
+        return f"Interview Schedule,{self.interview_type} "

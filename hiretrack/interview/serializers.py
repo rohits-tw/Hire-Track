@@ -14,3 +14,9 @@ class ListInterviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = InterviewForUser
         fields = "__all__"
+
+
+class UpdateStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InterviewForUser
+        fields = ["status"]
