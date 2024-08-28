@@ -240,6 +240,14 @@ class ChangePasswordView(APIView):
 
 
 class ForgotPasswordView(APIView):
+    """
+    Validates the email, retrieves the user, generates a reset URL, and sends a reset email.
+
+    **Responses:**
+        - 200 OK: Password reset email sent successfully.
+        - 400 Bad Request: Validation errors in the request data.
+    """
+
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -264,6 +272,13 @@ class ForgotPasswordView(APIView):
 
 
 class ResetPasswordView(APIView):
+    """
+    Validates the reset link, updates the user's password if valid, and returns appropriate responses.
+
+    **Responses:**
+        - 200 OK: Password reset successfully.
+    """
+
     permission_classes = [AllowAny]
 
     def post(self, request, uidb64, key):
