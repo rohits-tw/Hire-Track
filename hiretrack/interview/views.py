@@ -118,6 +118,10 @@ class ListInterviewHistoryByUserId(APIView):
                 {"status": False, "message": "No interviews found"},
                 status=status.HTTP_404_NOT_FOUND,
             )
+        serializer = ListInterviewHistoryByUserIdSerializer(interviews, many=True)
+        return Response(
+            {"status": True, "message": "Interview", "interviews": serializer.data}
+        )
 
 
 class UpdateInterviewStatusView(APIView):
@@ -143,10 +147,8 @@ class UpdateInterviewStatusView(APIView):
 
         if serializer.is_valid():
             serializer.save()
-            return Response({"status": True, "message": "interview status updated successfully"})
+            return Response(
+                {"status": True, "message": "interview status updated successfully"}
+            )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        serializer = ListInterviewHistoryByUserIdSerializer(interviews, many=True)
-        return Response(
-            {"status": True, "message": "Interview", "interviews": serializer.data}
-        )
