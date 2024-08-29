@@ -9,9 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from question_repository.models import QuestionRepository
-from question_repository.query import (
-    get_question_by_team_id,
-)
+from question_repository.query import get_question_by_team_id, get_by_id
 
 
 class CreateQuestionView(APIView):
@@ -44,11 +42,12 @@ class CreateQuestionView(APIView):
             raise APIException(detail=str(e))
 
 
-class GetQuestionsByTeamId(APIView):
+class GetQuestionsByTeamIdView(APIView):
     """
-    View to handle list all interview according to the interviewer id for the currently authenticated user:
-    This view handles GET requests to get all interview according to the interviewer id for the logged-in user.
-    It checks if interview details is not exists it returns an error.
+    API view to list all questions for a specific team ID for the authenticated user.
+
+    Handles GET requests to retrieve all questions associated with a given team ID.
+    Returns an error message if no questions are found.
     """
 
     permission_classes = [IsAuthenticated]
@@ -63,3 +62,38 @@ class GetQuestionsByTeamId(APIView):
             )
         serializer = GetQuestionSerializer(questions, many=True)
         return Response({"status": True, "Questions": serializer.data})
+
+
+class UpdateQuestionByIdView(APIView):
+    """
+    API view to update a question by its ID.
+
+    This view allows authenticated users to partially update
+    the details of a question identified by its ID.
+    """
+
+    permission_classes = [IsAuthenticated]
+    serializer_class = GetQuestionSerializer
+
+    def post(self, request, id):
+        try:
+            question = get_by_id(id)
+        except QuestionRepository.DoesNotExist:
+            return Response(
+                {"status": False, "message": "Question id not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        serializer = self.serializer_class(question, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {
+                    "status": True,
+                    "question_id": str(question.id),
+                    "message": "Question updated successfully",
+                }
+            )
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
