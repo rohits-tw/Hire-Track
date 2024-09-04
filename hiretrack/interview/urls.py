@@ -4,6 +4,7 @@ from interview.views import (
     ListInterviewsView,
     ListAllInterviewsView,
     ListInterviewHistoryByUserId,
+    UpdateInterviewStatusView,
 )
 
 
@@ -26,4 +27,10 @@ urlpatterns = [
         name="list-all-interview",
     ),
     # Above url is to list all interview
+    path(
+        "status-update/<int:id>/",
+        UpdateInterviewStatusView.as_view(),
+        name="update-interview-status",
+    ),
+    #Above url is to update the status of interview 
 ]

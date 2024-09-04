@@ -1,5 +1,4 @@
 version: '3'
-
 services:
   db:
     image: postgres
@@ -14,7 +13,6 @@ services:
       - "postgres_data:/var/lib/postgresql/data"
     networks:
       - hiretrack_network
-
   redis:
     image: redis:6
     container_name: hiretrack_redis
@@ -22,7 +20,6 @@ services:
       - "6379:6379"  # Map Redis port
     networks:
       - hiretrack_network
-
   web:
     build: .
     container_name: hiretrack_api
@@ -38,12 +35,14 @@ services:
       DATABASE: postgres
     networks:
       - hiretrack_network
-
-
 volumes:
   postgres_data:
-
-
 networks:
   hiretrack_network:
     driver: bridge
+
+
+
+
+
+

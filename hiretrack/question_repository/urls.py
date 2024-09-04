@@ -4,7 +4,8 @@ from question_repository.views import (
     GetQuestionsByTeamIdView,
     UpdateQuestionByIdView,
     GetQuestionByIdView,
-    DeleteQuestionView
+    DeleteQuestionView,
+    QuestionsAPIView
 )
 
 urlpatterns = [
@@ -29,5 +30,5 @@ urlpatterns = [
         DeleteQuestionView.as_view(),
         name="delete-quesion",
     ),
+    path("search-questions/", QuestionsAPIView.as_view(), name="search-question"),
 ]
-

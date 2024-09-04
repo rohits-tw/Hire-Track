@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from question_repository.models import QuestionRepository
 from question_repository.query import get_question_by_team_id, get_by_id
+from django.db.models import Q
 
 
 class CreateQuestionView(APIView):
@@ -143,3 +144,20 @@ class DeleteQuestionView(APIView):
                 {"status": "False", "message": "Id Doesn't exists!!"},
                 status=status.HTTP_404_NOT_FOUND,
             )
+class QuestionsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = GetQuestionSerializer
+
+    def get(self, request, *args, **kwargs):
+        queryset = QuestionRepository.objects.all()
+
+        search_query = request.query_params.get("search", None)
+        if search_query:
+            queryset = queryset.filter(
+                Q(topic__icontains=search_query)
+                | Q(difficulty_level__icontains=search_query)
+            )
+
+        serializer = self.serializer_class(queryset, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
