@@ -3,6 +3,7 @@ from question_repository.views import (
     CreateQuestionView,
     GetQuestionsByTeamIdView,
     UpdateQuestionByIdView,
+    QuestionsAPIView,
 )
 
 urlpatterns = [
@@ -17,4 +18,5 @@ urlpatterns = [
         UpdateQuestionByIdView.as_view(),
         name="update-quesion-by-id",
     ),
+    path("search-questions/", QuestionsAPIView.as_view(), name="search-question"),
 ]
