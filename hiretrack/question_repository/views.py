@@ -100,6 +100,50 @@ class UpdateQuestionByIdView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class GetQuestionByIdView(APIView):
+    """
+    API view to get a question by its ID.
+
+    This view allows authenticated users to get question by id
+    the details of a question identified by its ID.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, id):
+        try:
+            question = get_by_id(id)
+        except QuestionRepository.DoesNotExist:
+            return Response(
+                {"status": "False", "message": "Id Doesn't exists!!"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        serializer = GetQuestionSerializer(question)
+        return Response({"status": "True", "question": serializer.data})
+
+
+class DeleteQuestionView(APIView):
+    """
+    API view to delete a question by its ID.
+
+    This view allows authenticated users to delete question by id
+    the details of a question identified by its ID.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, id):
+        try:
+            question = get_by_id(id)
+            question.delete()
+            return Response(
+                {"status": "True", "message": "Question Deleted Successfully"}
+            )
+        except QuestionRepository.DoesNotExist:
+            return Response(
+                {"status": "False", "message": "Id Doesn't exists!!"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 class QuestionsAPIView(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = GetQuestionSerializer
