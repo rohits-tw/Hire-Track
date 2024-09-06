@@ -13,6 +13,7 @@ from mom.query import (
     get_mom_by_interview_id,
     get_all_mom,
     get_by_id,
+    update_by_interview_id,
 )
 from mom.models import Mom
 from django.db.models import Q
@@ -81,7 +82,7 @@ class UpdateMomByInterviewIdView(APIView):
 
     def put(self, request, id):
         try:
-            mom = Mom.objects.get(interview_id=id)
+            mom = update_by_interview_id(id)
         except Mom.DoesNotExist:
             return Response(
                 {

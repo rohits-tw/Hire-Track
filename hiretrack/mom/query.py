@@ -15,3 +15,8 @@ def get_all_mom():
 def get_by_id(id):
     team = Mom.objects.get(id=id)
     return team
+
+
+def update_by_interview_id(interview_id):
+    mom = Mom.objects.get(interview_id=interview_id)
+    return mom
