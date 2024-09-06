@@ -15,6 +15,7 @@ class Mom(models.Model):
     action_items = RichTextField(null=True, blank=True)
     next_step = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"Minute of meeting {self.interview_id}"

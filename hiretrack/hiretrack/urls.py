@@ -6,5 +6,6 @@ urlpatterns = [
     path('api/Teams/', include('Teams.urls')),
     path('api/interview/', include('interview.urls')),
     path('api/Question/', include('question_repository.urls')),
+    path('api/mom/', include('mom.urls')),
 ]
 
