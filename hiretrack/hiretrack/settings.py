@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "ckeditor",
     "question_repository",
     "mom",
+    "preparation"
 ]
 
 MIDDLEWARE = [
