@@ -5,13 +5,19 @@ from preparation.serializers import (
     AddPreparationSerializer,
     GetAllMaterialSerializer,
     AddBookMarkSerializer,
-
+    GetBookMarkByUserIdSerializer,
+    GetBookMarkSerializer,
 )
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import ValidationError, APIException, NotFound
 from rest_framework import status
-from preparation.query import get_all_material, get_by_id
-from preparation.models import PreparationModel
+from preparation.query import (
+    get_all_material,
+    get_by_id,
+    get_bookmark_id,
+    get_BookMark_By_UserId,
+)
+from preparation.models import PreparationModel, BookMarkModel
 from django.db.models import Q
 
 
@@ -206,3 +212,47 @@ class AddBookMarkView(APIView):
 
         except Exception as e:
             raise APIException(detail=str(e))
+
+
+class DeleteBookMarkView(APIView):
+    """
+    View to handle delete bookmark of material for the currently authenticated user:
+    This view handles DELETE requests to delete bookmark of material for the logged-in user.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, id):
+        try:
+            get_bookmark_by_id = get_bookmark_id(id)
+            get_bookmark_by_id.delete()
+            return Response(
+                {
+                    "status": True,
+                    "message": " BookMark removed successfully",
+                },
+                status=status.HTTP_200_OK,
+            )
+
+        except BookMarkModel.DoesNotExist:
+            return Response({"status": "False", "message": "Bookmark not found"})
+
+
+class GetBookMarkByUserIdView(APIView):
+    """
+    View to handle get bookmark of material by user id for the currently authenticated user:
+    This view handles GET requests to get bookmark of material by user id for the logged-in user.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, id):
+
+        bookmark = get_BookMark_By_UserId(id)
+        if not bookmark.exists():
+            return Response(
+                {"status": False, "message": "No Bookmark Found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        serializer = GetBookMarkByUserIdSerializer(bookmark, many=True)
+        return Response({"status": "True", "BookMark": serializer.data})

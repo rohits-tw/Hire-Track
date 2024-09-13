@@ -18,3 +18,17 @@ class AddBookMarkSerializer(serializers.ModelSerializer):
     class Meta:
         model = BookMarkModel
         fields = ["user_id", "material_id"]
+
+
+class GetBookMarkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PreparationModel
+        fields = ["id", "title", "content", "type", "link", "tags"]
+
+
+class GetBookMarkByUserIdSerializer(serializers.ModelSerializer):
+    material = GetBookMarkSerializer(read_only=True)
+
+    class Meta:
+        model = BookMarkModel
+        fields = ["id", "material", "bookmarked_at", "user_id"]

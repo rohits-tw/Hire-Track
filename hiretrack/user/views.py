@@ -69,13 +69,15 @@ class LoginAPIView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data["user"]
         refresh = RefreshToken.for_user(user)
-        return Response({
-            'refresh': str(refresh),
-            'access': str(refresh.access_token),
-        }, status=status.HTTP_200_OK)
-    
+        return Response(
+            {
+                "refresh": str(refresh),
+                "access": str(refresh.access_token),
+            },
+            status=status.HTTP_200_OK,
+        )
 
-        
+
 class LogoutAPIView(generics.GenericAPIView):
     """
     Handles user logout by blacklisting the refresh token.
@@ -110,7 +112,7 @@ class GetUser(APIView):
             user = get_user(id)
             if not user:
                 return Response({"status": False, "msg": "User does not exist"})
-            serializer = GetUserSerializers(user, many=False)
+            serializer = GetUserSerializers(user, many=True)
             return Response(
                 {"status": True, "msg": "User fetched.", "data": serializer.data}
             )

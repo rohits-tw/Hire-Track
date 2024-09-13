@@ -29,7 +29,7 @@ class BookMarkModel(models.Model):
     user_id = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE, related_name="user_id"
     )
-    material_id = models.ForeignKey(
+    material = models.ForeignKey(
         PreparationModel, on_delete=models.CASCADE, related_name="material_id"
     )
     bookmarked_at = models.DateTimeField(auto_now_add=True)
