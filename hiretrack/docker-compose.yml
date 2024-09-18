@@ -1,7 +1,7 @@
 version: '3'
 services:
   db:
-    image: postgres
+    image: postgres:13
     container_name: hiretrack_postgres
     environment:
       POSTGRES_DB: postgres
