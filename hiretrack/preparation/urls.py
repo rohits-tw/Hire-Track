@@ -7,6 +7,8 @@ from preparation.views import (
     DeleteMaterialView,
     SearchMaterialView,
     AddBookMarkView,
+    DeleteBookMarkView,
+    GetBookMarkByUserIdView,
 )
 
 
@@ -49,4 +51,16 @@ urlpatterns = [
         name="add-bookmark/",
     ),
     # Above URL is used to add bookmark to preperation
+    path(
+        "delete-bookmark/<int:id>/",
+        DeleteBookMarkView.as_view(),
+        name="delete-bookmark/",
+    ),
+    # Above URL is used to delete bookmark to preperation
+    path(
+        "get-bookmark-by-userid/<int:id>/",
+        GetBookMarkByUserIdView.as_view(),
+        name="get-bookmark-by-userid/",
+    ),
+    # Above URL is used to get bookmark by user-id
 ]

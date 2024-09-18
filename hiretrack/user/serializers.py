@@ -117,7 +117,7 @@ class GetUserSerializers(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ["id", "email", "phone_number", "user_detail"]
+        fields = ["id", "phone_number", "user_detail"]
 
 
 class AddUserDetailSerializers(serializers.ModelSerializer):
