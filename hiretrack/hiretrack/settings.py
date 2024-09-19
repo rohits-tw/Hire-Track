@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "mom",
     "preparation",
     "corsheaders",
+    "notification"
 ]
 
 MIDDLEWARE = [
