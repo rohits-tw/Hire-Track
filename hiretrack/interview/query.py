@@ -18,4 +18,4 @@ def get_interview_from_user_id(id):
 
 def get_by_id(id):
     interview = InterviewForUser.objects.get(id=id)
-    return interview 
+    return interview

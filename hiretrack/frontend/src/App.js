@@ -1,33 +1,24 @@
-// src/App.js
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import HomePage from './components/HomePage';
-import Sidebar from './components/Sidebar';
-import UserRegister from './components/UserRegister';
-import LoginPage from './components/LoginPage';
-import { Box } from '@mui/material';
+import logo from './logo.svg';
+import './App.css';
 
 function App() {
   return (
-    <Router>
-      <Box sx={{ display: 'flex' }}>
-        {/* Sidebar for navigation */}
-        <Sidebar />
-        
-        {/* Main content area */}
-        <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-          <Routes>
-            {/* Home page route */}
-            <Route path="/" element={<HomePage />} />
-            
-            <Route path="/user-register" element={<UserRegister />} />
-            
-            <Route path="/user-login" element={<LoginPage />} />
-            {/* Add more routes here for other pages like User Management, Team Management, etc. */}
-          </Routes>
-        </Box>
-      </Box>
-    </Router>
+    <div className="App">
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <p>
+          Edit <code>src/App.js</code> and save to reload.
+        </p>
+        <a
+          className="App-link"
+          href="https://reactjs.org"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Learn React
+        </a>
+      </header>
+    </div>
   );
 }
 
