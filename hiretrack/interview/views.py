@@ -23,7 +23,7 @@ from interview.query import (
 # Create your views here.
 class CreateInterviewsView(APIView):
     """
-    View to handle create unterview for the currently authenticated user:
+    View to handle create interview for the currently authenticated user:
     This view handles POST requests to create interview for the logged-in user.
     """
 
