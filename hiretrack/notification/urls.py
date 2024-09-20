@@ -4,6 +4,8 @@ from notification.views import (
     ImmediateRemainderView,
     DeleteRemainderView,
     NotificationAsReadView,
+    CreateNotificationView,
+    GetAllNotificationById,
 )
 
 urlpatterns = [
@@ -26,5 +28,15 @@ urlpatterns = [
         "mark-as-read/<int:id>/",
         NotificationAsReadView.as_view(),
         name="mark-as-read/",
+    ),
+    path(
+        "create-notification/",
+        CreateNotificationView.as_view(),
+        name="create-notification",
+    ),
+    path(
+        "List-notification-By-User-Id/<int:id>/",
+        GetAllNotificationById.as_view(),
+        name="get-all-notification",
     ),
 ]
